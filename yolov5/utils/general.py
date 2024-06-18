@@ -1053,7 +1053,7 @@ def non_max_suppression(
             x = torch.cat((box[i], x[i, 5 + j, None], j[:, None].float(), mask[i]), 1)
         else:  # best class only
             conf, j = x[:, 5:mi].max(1, keepdim=True)
-            x = torch.cat((box, conf, j.float(), objectness, mask), 1)[conf.view(-1) > conf_thres]
+            x = torch.cat((box, conf, j.float(), objectness, cls_conf, mask), 1)[conf.view(-1) > conf_thres]
 
         # Filter by class
         if classes is not None:
