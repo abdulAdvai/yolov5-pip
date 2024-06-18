@@ -713,7 +713,7 @@ class AutoShape(nn.Module):
 
             # Post-process
             with dt[2]:
-                y = non_max_suppression(y if self.dmb else y[0],
+                y, objectness_list, class_conf_list, indices_list, original_prediction, loss = non_max_suppression(y if self.dmb else y[0],
                                         self.conf,
                                         self.iou,
                                         self.classes,
@@ -723,7 +723,7 @@ class AutoShape(nn.Module):
                 for i in range(n):
                     scale_boxes(shape1, y[i][:, :4], shape0[i])
 
-            return Detections(ims, y, files, dt, self.names, x.shape)
+            return Detections(ims, y, files, dt, self.names, x.shape), objectness_list, class_conf_list, indices_list, original_prediction, loss
 
 
 class Detections:
@@ -739,8 +739,8 @@ class Detections:
         self.times = times  # profiling times
         self.xyxy = pred  # xyxy pixels
         self.xywh = [xyxy2xywh(x) for x in pred]  # xywh pixels
-        self.xyxyn = [x / g for x, g in zip(self.xyxy, gn)]  # xyxy normalized
-        self.xywhn = [x / g for x, g in zip(self.xywh, gn)]  # xywh normalized
+        # self.xyxyn = [x / g for x, g in zip(self.xyxy, gn)]  # xyxy normalized
+        # self.xywhn = [x / g for x, g in zip(self.xywh, gn)]  # xywh normalized
         self.n = len(self.pred)  # number of images (batch size)
         self.t = tuple(x.t / self.n * 1E3 for x in times)  # timestamps (ms)
         self.s = tuple(shape)  # inference BCHW shape
