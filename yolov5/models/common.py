@@ -723,17 +723,18 @@ class AutoShape(nn.Module):
                 for i in range(n):
                     scale_boxes(shape1, y[i][:, :4], shape0[i])
 
-            return Detections(ims, y, files, dt, self.names, x.shape), objectness_list, class_conf_list, indices_list, original_prediction, loss
+            return Detections(ims, y, files, dt, self.names, x.shape, original_pred=original_prediction)
 
 
 class Detections:
     # YOLOv5 detections class for inference results
-    def __init__(self, ims, pred, files, times=(0, 0, 0), names=None, shape=None):
+    def __init__(self, ims, pred, files, times=(0, 0, 0), names=None, shape=None, original_pred=None):
         super().__init__()
         d = pred[0].device  # device
         gn = [torch.tensor([*(im.shape[i] for i in [1, 0, 1, 0]), 1, 1], device=d) for im in ims]  # normalizations
         self.ims = ims  # list of images as numpy arrays
         self.pred = pred  # list of tensors pred[0] = (xyxy, conf, cls)
+        self.logits = original_pred
         self.names = names  # class names
         self.files = files  # image filenames
         self.times = times  # profiling times
